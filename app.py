@@ -1,7 +1,6 @@
 """
 Flask API for email validation
 """
-
 from flask import Flask, request, jsonify
 from controller.SendMail.sendmail import validate_email
 
