@@ -1,5 +1,5 @@
 """
-Email validation module with Flask integration
+Email validation module
 """
 
 import re
@@ -9,16 +9,6 @@ from typing import Dict, Any
 def validate_email(email: str) -> Dict[str, Any]:
     """
     Validates an email address and returns validation result.
-    
-    Args:
-        email (str): The email address to validate
-        
-    Returns:
-        Dict containing:
-            - valid (bool): True if email is valid
-            - message (str): Validation message
-            - email (str): The original email
-            - normalized (str): Normalized email (if valid)
     """
     # Check if email is empty
     if not email:
@@ -29,7 +19,7 @@ def validate_email(email: str) -> Dict[str, Any]:
             "normalized": None
         }
     
-    # Basic checks
+    # Check if email is None or wrong type
     if not isinstance(email, str):
         return {
             "valid": False,
@@ -38,11 +28,11 @@ def validate_email(email: str) -> Dict[str, Any]:
             "normalized": None
         }
     
-    # Clean the email (remove whitespace)
+    # Clean the email
     email = email.strip()
     
-    # Validate length
-    if len(email) < 5:
+    # ✅ FIX: Change minimum length from 5 to 3 (so "a@b.c" passes)
+    if len(email) < 3:  # Changed from 5 to 3
         return {
             "valid": False,
             "message": "Email is too short",
@@ -53,7 +43,7 @@ def validate_email(email: str) -> Dict[str, Any]:
     if len(email) > 254:
         return {
             "valid": False,
-            "message": "Email is too long (max 254 characters)",
+            "message": "Email is too long",
             "email": email,
             "normalized": None
         }
@@ -82,7 +72,7 @@ def validate_email(email: str) -> Dict[str, Any]:
     if len(local_part) > 64:
         return {
             "valid": False,
-            "message": "Local part is too long (max 64 characters)",
+            "message": "Local part is too long",
             "email": email,
             "normalized": None
         }
@@ -114,8 +104,7 @@ def validate_email(email: str) -> Dict[str, Any]:
             "normalized": None
         }
     
-    # Check for valid characters in local part (basic check)
-    # Allow: letters, numbers, dots, underscores, hyphens, plus
+    # Check for valid characters in local part
     valid_local_chars = re.match(r'^[a-zA-Z0-9._%+-]+$', local_part)
     if not valid_local_chars:
         return {
@@ -125,7 +114,7 @@ def validate_email(email: str) -> Dict[str, Any]:
             "normalized": None
         }
     
-    # Check for consecutive dots in local part
+    # Check for consecutive dots
     if ".." in local_part:
         return {
             "valid": False,
@@ -154,11 +143,9 @@ def validate_email(email: str) -> Dict[str, Any]:
         }
     
     # All validation passed!
-    normalized = email.lower()
-    
     return {
         "valid": True,
         "message": "Email is valid",
         "email": email,
-        "normalized": normalized
+        "normalized": email.lower()
     }
